@@ -6,19 +6,21 @@ import (
 	"backend/common"
 	"flag"
 	"runtime"
+	"sync"
+	"strings"
 )
 
 var mapLogNameToLogFile map[string]*os.File = make(map[string]*os.File)
-
+var wg sync.WaitGroup
 const (
 	DEFAULT_CONF_FILE = "./log-sink.conf"
 )
 
 var g_conf_file string
 var gRedisPath string
-var gRedisPort string
-var gRedisListKey string
-var gWorkerCount int64
+var gRedisPortList string
+var gRedisKey string
+var gWriterCount int64
 
 
 func init() {
@@ -28,9 +30,9 @@ func init() {
 
 func InitExternalConfig(config *common.Configure)  {
 	gRedisPath = config.External["redisPath"]
-	gRedisPort = config.External["redisPort"]
-	gRedisListKey = config.External["redisListKey"]
-	gWorkerCount = config.ExternalInt64["workerCount"]
+	gRedisPortList = config.External["redisPortList"]
+	gRedisKey = config.External["redisKey"]
+	gWriterCount = config.ExternalInt64["writerCount"]
 }
 
 func main() {
@@ -59,9 +61,12 @@ func main() {
 		return
 	}
 	InitExternalConfig(common.Config)
-	var channel = make(chan []byte, gWorkerCount)
-	for i := 0; i < int(gWorkerCount); i++ {
-		go worker(channel)
+	ports := strings.Split(gRedisPortList, "|")
+
+	wg.Add(len(ports))
+	for i := 0; i < len(ports); i++ {
+		redisUrl := gRedisPath + ports[i]
+		go consumer(redisUrl)
 	}
-	producter(channel)
+	wg.Wait()
 }

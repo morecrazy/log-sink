@@ -1,0 +1,10 @@
+*.log
+nohup.out
+*.iml
+*.swp
+*tmp*
+log/*
+*.pid
+.idea
+.DS_Store
+.build

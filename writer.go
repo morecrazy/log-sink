@@ -40,7 +40,7 @@ func getLogFile(logName string) *os.File {
 	return pFile
 }
 
-func worker(channel chan []byte) {
+func writer(channel chan []byte) {
 	for {
 		bts := <- channel
 		var res map[string]interface{}
