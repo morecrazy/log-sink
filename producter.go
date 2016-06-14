@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func producter() {
+func producter(channel chan []byte) {
 	var redisUrl = gRedisPath + gRedisPort
 	c, err := redis.Dial("tcp", redisUrl)
 	if err != nil {

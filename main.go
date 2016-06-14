@@ -9,7 +9,6 @@ import (
 )
 
 var mapLogNameToLogFile map[string]*os.File = make(map[string]*os.File)
-var channel = make(chan []byte, gWorkerCount)
 
 const (
 	DEFAULT_CONF_FILE = "./log-sink.conf"
@@ -60,8 +59,9 @@ func main() {
 		return
 	}
 	InitExternalConfig(common.Config)
+	var channel = make(chan []byte, gWorkerCount)
 	for i := 0; i < int(gWorkerCount); i++ {
-		go worker()
+		go worker(channel)
 	}
-	producter()
+	producter(channel)
 }
