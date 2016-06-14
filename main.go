@@ -36,7 +36,6 @@ func InitExternalConfig(config *common.Configure)  {
 }
 
 func main() {
-	var wg sync.WaitGroup
 	//set runtime variable
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	//get flag
@@ -65,7 +64,5 @@ func main() {
 	for i := 0; i < int(gWorkerCount); i++ {
 		go worker()
 	}
-	go producter()
-	// 等待所有任务完成
-	wg.Wait()
+	producter()
 }
