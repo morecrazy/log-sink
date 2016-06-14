@@ -35,7 +35,6 @@ func InitExternalConfig(config *common.Configure)  {
 }
 
 func main() {
-	common.Logger.Info("starting collect log\n")
 	//set runtime variable
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	//get flag
