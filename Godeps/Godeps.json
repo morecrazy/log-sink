@@ -4,7 +4,7 @@
 	"Deps": [
 		{
 			"ImportPath": "backend/common",
-			"Rev": "fdcbdad4ce8df96114167aea9996d0231bfc8ca9"
+			"Rev": "8b97dd1f6e1d4fabc77c10e59b1122f12d985d93"
 		},
 		{
 			"ImportPath": "backend/jsonrpc",
@@ -40,6 +40,10 @@
 			"ImportPath": "third/etcd/pkg/types",
 			"Comment": "v2.3.0-alpha.1-63-gd8b124c",
 			"Rev": "d8b124cf3a259924aef604c394a4bd8b9a2fd0fe"
+		},
+		{
+			"ImportPath": "third/g2s",
+			"Rev": "ec76db4c1ac16400ac0e17ca9c4840e1d23da5dc"
 		},
 		{
 			"ImportPath": "third/gin",
@@ -113,6 +117,10 @@
 		{
 			"ImportPath": "third/spew",
 			"Rev": "bac5037f35387577a1988dbed21f3c4c9d90d801"
+		},
+		{
+			"ImportPath": "third/upyun",
+			"Rev": "28feed63e9f7784158c9dec228daca1c0de41480"
 		}
 	]
 }
