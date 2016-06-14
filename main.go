@@ -6,6 +6,7 @@ import (
 	"backend/common"
 	"flag"
 	"runtime"
+	"sync"
 )
 
 var mapLogNameToLogFile map[string]*os.File = make(map[string]*os.File)
@@ -35,6 +36,7 @@ func InitExternalConfig(config *common.Configure)  {
 }
 
 func main() {
+	var wg sync.WaitGroup
 	//set runtime variable
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	//get flag
@@ -64,4 +66,6 @@ func main() {
 		go worker()
 	}
 	go producter()
+	// 等待所有任务完成
+	wg.Wait()
 }
