@@ -1,0 +1,29 @@
+{
+	"ImportPath": "third/etcd-client",
+	"GoVersion": "go1.5",
+	"Deps": [
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/pathutil",
+			"Comment": "v2.3.0-alpha.0-499-g9ca3c8e",
+			"Rev": "9ca3c8e5813e83b7f32b64c4037f569143f59445"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/testutil",
+			"Comment": "v2.3.0-alpha.0-499-g9ca3c8e",
+			"Rev": "9ca3c8e5813e83b7f32b64c4037f569143f59445"
+		},
+		{
+			"ImportPath": "github.com/coreos/etcd/pkg/types",
+			"Comment": "v2.3.0-alpha.0-499-g9ca3c8e",
+			"Rev": "9ca3c8e5813e83b7f32b64c4037f569143f59445"
+		},
+		{
+			"ImportPath": "github.com/ugorji/go/codec",
+			"Rev": "646ae4a518c1c3be0739df898118d9bccf993858"
+		},
+		{
+			"ImportPath": "third/context",
+			"Rev": "e8775ff78ce91dcee9661831ab97ede324370f65"
+		}
+	]
+}

@@ -1,0 +1,118 @@
+{
+	"ImportPath": "codoon_ops/log-sink",
+	"GoVersion": "go1.5.2",
+	"Deps": [
+		{
+			"ImportPath": "backend/common",
+			"Rev": "fdcbdad4ce8df96114167aea9996d0231bfc8ca9"
+		},
+		{
+			"ImportPath": "backend/jsonrpc",
+			"Rev": "2a6316c3f14c310605ea5ddfd713981f6409c49c"
+		},
+		{
+			"ImportPath": "backend/rpc",
+			"Comment": "1.0.0.0-14-g64ea240",
+			"Rev": "64ea240575696525a1043fe72fc52a5740b6ce76"
+		},
+		{
+			"ImportPath": "third/amqp",
+			"Rev": "6a378341a305bfbc252e8a6638f16cf443221997"
+		},
+		{
+			"ImportPath": "third/context",
+			"Rev": "e8775ff78ce91dcee9661831ab97ede324370f65"
+		},
+		{
+			"ImportPath": "third/crc32",
+			"Rev": "19b0b332c9e4516a6370a0456e6182c3b5036720"
+		},
+		{
+			"ImportPath": "third/etcd-client",
+			"Rev": "0f6ee4fcd8661206e87df3a77bc7034d6cf0cc26"
+		},
+		{
+			"ImportPath": "third/etcd/pkg/pathutil",
+			"Comment": "v2.3.0-alpha.1-63-gd8b124c",
+			"Rev": "d8b124cf3a259924aef604c394a4bd8b9a2fd0fe"
+		},
+		{
+			"ImportPath": "third/etcd/pkg/types",
+			"Comment": "v2.3.0-alpha.1-63-gd8b124c",
+			"Rev": "d8b124cf3a259924aef604c394a4bd8b9a2fd0fe"
+		},
+		{
+			"ImportPath": "third/gin",
+			"Rev": "77d3c757880cfce1b4629889e0eb0b42337f66c7"
+		},
+		{
+			"ImportPath": "third/go-celery",
+			"Rev": "f6a9eac8a071a9cc2888c2c1e475e2e2ca968157"
+		},
+		{
+			"ImportPath": "third/go-codec/codec",
+			"Rev": "03b46f3d7a8e0457836a5ecd906b4961a5815a63"
+		},
+		{
+			"ImportPath": "third/go-colorable",
+			"Rev": "e9e01442ee69c11e5625627bd147d1db1f0e752f"
+		},
+		{
+			"ImportPath": "third/go-logging",
+			"Comment": "1.0.0.1-12-gaf2f85d",
+			"Rev": "af2f85d115da56f8c829765e8be7df1828262018"
+		},
+		{
+			"ImportPath": "third/go-resiliency/breaker",
+			"Rev": "b86b1ec0dd4209a588dc1285cdd471e73525c0b3"
+		},
+		{
+			"ImportPath": "third/gorm",
+			"Comment": "1.0.0.0-11-gc43d2db",
+			"Rev": "c43d2db236ee05d67c2c6822b09fbb5a85598efb"
+		},
+		{
+			"ImportPath": "third/gouuid",
+			"Rev": "179d4d0c4d8d407a32af483c2354df1d2c91e6c3"
+		},
+		{
+			"ImportPath": "third/httprouter",
+			"Rev": "6ab31338b6fe01c5b1b14d478333a9285fda638d"
+		},
+		{
+			"ImportPath": "third/kafka",
+			"Rev": "3bbdb7901b8e2e9ef5553de829fadc34f24945d6"
+		},
+		{
+			"ImportPath": "third/pq/hstore",
+			"Comment": "1.0.0.0",
+			"Rev": "b75b54a6bfbc58764ab696a6cb5f6e7fe3f980ad"
+		},
+		{
+			"ImportPath": "third/queue",
+			"Rev": "ded5959c0d4e360646dc9e9908cff48666781367"
+		},
+		{
+			"ImportPath": "third/raven-go",
+			"Rev": "74c334d7b8aaa4fd1b4fc6aa428c36fed1699e28"
+		},
+		{
+			"ImportPath": "third/redigo/internal",
+			"Comment": "1.0.0.0-2-g29e6887",
+			"Rev": "29e68875545399f1d96d751398b88d05cb55783b"
+		},
+		{
+			"ImportPath": "third/redigo/redis",
+			"Comment": "1.0.0.0-2-g29e6887",
+			"Rev": "29e68875545399f1d96d751398b88d05cb55783b"
+		},
+		{
+			"ImportPath": "third/snappy",
+			"Rev": "34040df428fe3cde147c12c25e82bffd1189ae10"
+		},
+		{
+			"ImportPath": "third/spew",
+			"Rev": "bac5037f35387577a1988dbed21f3c4c9d90d801"
+		}
+	]
+}
