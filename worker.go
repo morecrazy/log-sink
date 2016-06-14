@@ -24,6 +24,10 @@ func getLogFile(logName string) *os.File {
 			fmt.Errorf("Start: ", err.Error())
 			return nil
 		}
+		if err := cmd.Wait(); err != nil {
+			fmt.Errorf("Wait: ", err.Error())
+			return nil
+		}
 		if err != nil {
 			fmt.Printf("Cant OpenFile: %s Err: %s", logName, err)
 			return nil
