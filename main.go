@@ -6,7 +6,6 @@ import (
 	"backend/common"
 	"flag"
 	"runtime"
-	"sync"
 )
 
 var mapLogNameToLogFile map[string]*os.File = make(map[string]*os.File)
