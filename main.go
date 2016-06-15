@@ -21,7 +21,8 @@ var gRedisPath string
 var gRedisPortList string
 var gRedisKey string
 var gWriterCount int64
-
+var gLogSize int64
+var gLogUnit string
 
 func init() {
 	const usage = "log-sink [-c config_file]"
@@ -32,6 +33,8 @@ func InitExternalConfig(config *common.Configure)  {
 	gRedisPath = config.External["redisPath"]
 	gRedisPortList = config.External["redisPortList"]
 	gRedisKey = config.External["redisKey"]
+	gLogUnit = config.External["logUnit"]
+	gLogSize = config.ExternalInt64["logSize"]
 	gWriterCount = config.ExternalInt64["writerCount"]
 }
 
