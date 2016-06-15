@@ -120,8 +120,9 @@ func writeLog(bts []byte) error{
 
 
 func writer(channel chan []byte) {
-	timer := time.NewTicker(60 * time.Second)
+	//timer := time.NewTicker(60 * time.Second)
 	for {
+		/**
 		select {
 		case <-timer.C:
 			//判断pFile文件大小,如果超过限制则备份文件,并且打开一个新文件用于写
@@ -138,6 +139,10 @@ func writer(channel chan []byte) {
 			if err := writeLog(bts); err != nil {
 				common.Logger.Error(err.Error())
 			}
+		}**/
+		bts := <- channel
+		if err := writeLog(bts); err != nil {
+			common.Logger.Error(err.Error())
 		}
 	}
 }
