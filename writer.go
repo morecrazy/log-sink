@@ -7,28 +7,40 @@ import (
 	"encoding/json"
 	"net/http"
 	"backend/common"
+	"sync"
 )
 
+type File struct {
+	l *sync.Mutex
+	file *os.File
+}
+
 //获取单个文件的大小
-func backupLog(bts []byte) error {
+//flag: 是否进行了备份操作
+func backupLog(bts []byte) (flag bool, err error) {
 	var isNeedBackUp bool = false
 	var res map[string]interface{}
 
 	if err := json.Unmarshal(bts, &res); err != nil {
-		return &LogSinkError{Code: http.StatusInternalServerError, Message : "json unmarshal failed: " + err.Error()}
+		return false, &LogSinkError{Code: http.StatusInternalServerError, Message : "json unmarshal failed: " + err.Error()}
 	}
 	if res["path"] == nil {
-		return &LogSinkError{Code: http.StatusInternalServerError, Message: "the log path is empty"}
+		return false, &LogSinkError{Code: http.StatusInternalServerError, Message: "the log path is empty"}
 	}
 	logName := res["path"].(string)
-
 	logPostFix := time.Now().Format("2006-01-02")
 	logFullName := logName + "." + logPostFix
 
+	myFile := mapLogNameToLogFile[logFullName]
+	if myFile == nil { return false, nil }
+	//开始备份操作
+	myFile.l.Lock()
+	defer myFile.l.Unlock()
 	common.Logger.Debug("Starting judge the need for the backup of file: %s", logFullName)
+
 	fileInfo, err := os.Stat(logFullName)
 	if err != nil {
-		return &LogSinkError{Code: http.StatusInternalServerError, Message: "stat file " + logFullName + " failed: " + err.Error()}
+		return false, &LogSinkError{Code: http.StatusInternalServerError, Message: "stat file " + logFullName + " failed: " + err.Error()}
 	}
 	fileSize := fileInfo.Size() //获取size
 
@@ -44,32 +56,38 @@ func backupLog(bts []byte) error {
 		if fileSize >= gLogSize {isNeedBackUp = true}
 	}
 	if isNeedBackUp {
-		//如果需要备份
+		//如果需要备份,则备份文件,且打开新文件
 		t := time.Now()
 		newVersion := t.Format("150405")
 		newLogName := logFullName + "." + newVersion
 		common.Logger.Debug("Starting backup file %s to new file %s", logFullName, newLogName)
 		if err := os.Rename(logFullName, newLogName); err != nil {
-			return &LogSinkError{Code: http.StatusInternalServerError, Message : "rename file error: " + err.Error()}
+			return false, &LogSinkError{Code: http.StatusInternalServerError, Message : "rename file error: " + err.Error()}
 		}
+		//删除map中的记录
 		delete(mapLogNameToLogFile, logFullName)
+		//往新文件中写入数据
+		err := writeLog(bts)
+		return true, err
 	}
-	return nil
+	return false, nil
 }
 
 func getLogFile(logName string) (*os.File, error) {
-	var pFile *os.File = nil
 	logPostFix := time.Now().Format("2006-01-02")
 	logFullName := logName + "." + logPostFix
-	pFile = mapLogNameToLogFile[logFullName]
-	if pFile == nil {
+	myFile := mapLogNameToLogFile[logFullName]
+	if myFile == nil {
 		common.Logger.Debug("Starting open a new log file: %s", logFullName)
 		var err error
-		pFile, err = os.OpenFile(logFullName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
+		pFile, err := os.OpenFile(logFullName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
 			return nil, &LogSinkError{Code: http.StatusInternalServerError, Message : "Cannot OpenFile " + logFullName + " , Err: " + err.Error()}
 		}
-		mapLogNameToLogFile[logFullName] = pFile
+		myFile = new(File)
+		myFile.file = pFile
+		myFile.l = new(sync.Mutex)
+		mapLogNameToLogFile[logFullName] = myFile
 
 		//为新打开的文件建立软链接
 		command := "ln -s -f " + logFullName + " " + logName
@@ -85,7 +103,7 @@ func getLogFile(logName string) (*os.File, error) {
 		}
 	}
 
-	return pFile, nil
+	return myFile.file, nil
 }
 
 func writeLog(bts []byte) error{
@@ -120,18 +138,21 @@ func writeLog(bts []byte) error{
 
 
 func writer(channel chan []byte) {
-	//timer := time.NewTicker(60 * time.Second)
+	timer := time.NewTicker(60 * time.Second)
 	for {
-		/**
 		select {
 		case <-timer.C:
 			//判断pFile文件大小,如果超过限制则备份文件,并且打开一个新文件用于写
 			bts := <- channel
-			if err := backupLog(bts); err != nil {
+			flag, err := backupLog(bts)
+			if err != nil {
 				common.Logger.Error(err.Error())
 			}
-			if err := writeLog(bts); err != nil {
-				common.Logger.Error(err.Error())
+		    //如果没有进行备份,则将这条记录写入日志文件中
+		    if flag == false {
+				if err := writeLog(bts); err != nil {
+					common.Logger.Error(err.Error())
+				}
 			}
 		default:
 			//从channel读取数据,写入文件里
@@ -139,10 +160,6 @@ func writer(channel chan []byte) {
 			if err := writeLog(bts); err != nil {
 				common.Logger.Error(err.Error())
 			}
-		}**/
-		bts := <- channel
-		if err := writeLog(bts); err != nil {
-			common.Logger.Error(err.Error())
 		}
 	}
 }

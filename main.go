@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"backend/common"
 	"flag"
 	"runtime"
@@ -10,7 +9,7 @@ import (
 	"strings"
 )
 
-var mapLogNameToLogFile map[string]*os.File = make(map[string]*os.File)
+var mapLogNameToLogFile map[string]*File = make(map[string]*File)
 var wg sync.WaitGroup
 const (
 	DEFAULT_CONF_FILE = "./log-sink.conf"
