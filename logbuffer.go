@@ -16,6 +16,7 @@ type LogBuffer struct {
 func (b *LogBuffer) WriteString(s string) (n int, err error) {
 	b.m.Lock()
 	defer b.m.Unlock()
+	common.Logger.Debug("start write string to buffer")
 	b.len ++
 	if b.len >= gLogBufferSize {
 		b.ch <- true
