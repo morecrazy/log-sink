@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"sync"
+	"backend/common"
 )
 type LogBuffer struct {
 	m *sync.Mutex
@@ -26,6 +27,7 @@ func (b *LogBuffer) ReadString() string {
 	b.m.Lock()
 	defer b.m.Unlock()
 	str := b.buf.String()
+	common.Logger.Debug("start read string from logbuffer, the log buffer name is %s, and the length is %d", b.name, b.len)
 	b.buf.Reset()
 	b.len = 0
 	return str
