@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"sync"
+	"backend/common"
 )
 type LogBuffer struct {
 	m *sync.Mutex
@@ -25,6 +26,7 @@ func (b *LogBuffer) WriteString(s string) (n int, err error) {
 func (b *LogBuffer) ReadString() string {
 	select {
 	case <-b.ch:
+		common.Logger.Debug("start read string from buffer")
 		b.m.Lock()
 		defer b.m.Unlock()
 		str := b.buf.String()
@@ -33,5 +35,16 @@ func (b *LogBuffer) ReadString() string {
 		return str
 	default:
 		return ""
+	}
+}
+
+func (b *LogBuffer) ForceWrite() {
+	b.m.Lock()
+	defer b.m.Unlock()
+	select {
+	case b.ch<- true:
+		common.Logger.Debug("force restart channel")
+	default:
+		common.Logger.Debug("the channel is already setted")
 	}
 }

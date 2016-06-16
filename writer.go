@@ -196,9 +196,8 @@ func logWriter(logBuffer *LogBuffer) {
 	for {
 		select {
 		case <-timer.C:
-			common.Logger.Debug("Time out! Start force flush log bufer to disk")
 			//超时时间到,强制读取数据
-			logBuffer.ch <- true
+			logBuffer.ForceWrite()
 		default:
 			//从channel读取数据,写入文件里
 			str := logBuffer.ReadString()
