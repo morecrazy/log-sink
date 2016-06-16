@@ -199,10 +199,8 @@ func logWriter(logBuffer *LogBuffer) {
 		select {
 		case <-timer.C:
 			//超时时间到,强制读取数据
-			//logBuffer.ForceSet()
-			logBuffer.ch <- true
-			common.Logger.Debug("force restart channel")
-			//从channel读取数据,写入文件里
+			logBuffer.ForceSet()
+			//从buf读取数据,写入文件里
 			str := logBuffer.ReadString()
 			if str != "" {
 				if err := writeLog(logBuffer.name, str); err != nil {
@@ -210,7 +208,7 @@ func logWriter(logBuffer *LogBuffer) {
 				}
 			}
 		default:
-			//从channel读取数据,写入文件里
+			//从buf读取数据,写入文件里
 			str := logBuffer.ReadString()
 		    if str != "" {
 				if err := writeLog(logBuffer.name, str); err != nil {

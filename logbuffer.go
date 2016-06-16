@@ -42,7 +42,7 @@ func (b *LogBuffer) ReadString() string {
 func (b *LogBuffer) ForceSet() {
 	select {
 	case b.ch<-true:
-		common.Logger.Debug("force restart channel")
+		common.Logger.Debug("force reset channel")
 	default:
 		common.Logger.Debug("the channel is already setted")
 	}
