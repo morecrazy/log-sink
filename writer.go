@@ -191,10 +191,11 @@ func bufWriter(channel chan []byte) {
 }
 
 func logWriter(logBuffer *LogBuffer) {
-	timer := time.NewTicker(30 * time.Second)
+	timer := time.NewTicker(10 * time.Second)
 	for {
 		select {
 		case <-timer.C:
+			common.Logger.Debug("Time out! Start force flush log bufer to disk")
 			//超时时间到,强制读取数据
 			logBuffer.ch <- true
 		default:

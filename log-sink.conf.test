@@ -9,8 +9,8 @@
     "logUnit": "MB"
   },
   "ExternalInt64": {
-    "writerCount": 1000,
-    "logSize": 1024,
+    "writerCount": 100,
+    "logSize": 100,
     "logBufferSize": 100
   }
 }
