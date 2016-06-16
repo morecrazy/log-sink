@@ -117,6 +117,7 @@ func getLogBuffer(logName string) *LogBuffer {
 		logBuffer.buf = new(bytes.Buffer)
 		logBuffer.m = new(sync.Mutex)
 		logBuffer.ch = make(chan bool)
+		logBuffer.name = logName
 		mapLogNameToLogBuffer[logFullName] = logBuffer
 		go logWriter(logBuffer)
 	}
@@ -197,7 +198,14 @@ func logWriter(logBuffer *LogBuffer) {
 		select {
 		case <-timer.C:
 			//超时时间到,强制读取数据
-			logBuffer.ForceWrite()
+			logBuffer.ForceSet()
+			//从channel读取数据,写入文件里
+			str := logBuffer.ReadString()
+			if str != "" {
+				if err := writeLog(logBuffer.name, str); err != nil {
+					common.Logger.Error(err.Error())
+				}
+			}
 		default:
 			//从channel读取数据,写入文件里
 			str := logBuffer.ReadString()

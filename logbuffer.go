@@ -38,7 +38,7 @@ func (b *LogBuffer) ReadString() string {
 	}
 }
 
-func (b *LogBuffer) ForceWrite() {
+func (b *LogBuffer) ForceSet() {
 	b.m.Lock()
 	defer b.m.Unlock()
 	select {
