@@ -112,6 +112,7 @@ func getLogBuffer(logName string) *LogBuffer {
 	logFullName := logName + "." + logPostFix
 	logBuffer := mapLogNameToLogBuffer[logFullName]
 	if logBuffer == nil {
+		common.Logger.Debug("Creating a new logbuffer")
 		logBuffer = new(LogBuffer)
 		logBuffer.buf = new(bytes.Buffer)
 		logBuffer.m = new(sync.Mutex)
@@ -201,8 +202,10 @@ func logWriter(logBuffer *LogBuffer) {
 		default:
 			//从channel读取数据,写入文件里
 			str := logBuffer.ReadString()
-			if err := writeLog(logBuffer.name, str); err != nil {
-				common.Logger.Error(err.Error())
+		    if str != "" {
+				if err := writeLog(logBuffer.name, str); err != nil {
+					common.Logger.Error(err.Error())
+				}
 			}
 		}
 	}

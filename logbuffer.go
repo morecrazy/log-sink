@@ -23,11 +23,15 @@ func (b *LogBuffer) WriteString(s string) (n int, err error) {
 }
 
 func (b *LogBuffer) ReadString() string {
-	<-b.ch
-	b.m.Lock()
-	defer b.m.Unlock()
-	str := b.buf.String()
-	b.buf.Reset()
-	b.len = 0
-	return str
+	select {
+	case <-b.ch:
+		b.m.Lock()
+		defer b.m.Unlock()
+		str := b.buf.String()
+		b.buf.Reset()
+		b.len = 0
+		return str
+	default:
+		return ""
+	}
 }
