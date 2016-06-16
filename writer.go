@@ -197,23 +197,18 @@ func logWriter(logBuffer *LogBuffer) {
 	timer := time.NewTicker(1 * time.Second)
 	for {
 		select {
+		case <- logBuffer.ch:
+			//从buf读取数据,写入文件里
+			str := logBuffer.ReadString()
+			if err := writeLog(logBuffer.name, str); err != nil {
+				common.Logger.Error(err.Error())
+			}
 		case <-timer.C:
 			//超时时间到,强制读取数据
-			logBuffer.ForceSet()
 			//从buf读取数据,写入文件里
 			str := logBuffer.ReadString()
-			if str != "" {
-				if err := writeLog(logBuffer.name, str); err != nil {
-					common.Logger.Error(err.Error())
-				}
-			}
-		default:
-			//从buf读取数据,写入文件里
-			str := logBuffer.ReadString()
-		    if str != "" {
-				if err := writeLog(logBuffer.name, str); err != nil {
-					common.Logger.Error(err.Error())
-				}
+			if err := writeLog(logBuffer.name, str); err != nil {
+				common.Logger.Error(err.Error())
 			}
 		}
 	}
