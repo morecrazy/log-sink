@@ -112,12 +112,12 @@ func getLogBuffer(logName string) *LogBuffer {
 	logFullName := logName + "." + logPostFix
 	logBuffer := mapLogNameToLogBuffer[logFullName]
 	if logBuffer == nil {
-		go logWriter(logBuffer)
 		logBuffer = new(LogBuffer)
 		logBuffer.buf = new(bytes.Buffer)
 		logBuffer.m = new(sync.Mutex)
 		logBuffer.ch = make(chan bool)
 		mapLogNameToLogBuffer[logFullName] = logBuffer
+		go logWriter(logBuffer)
 	}
 	return logBuffer
 }
