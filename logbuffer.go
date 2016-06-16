@@ -18,7 +18,7 @@ func (b *LogBuffer) WriteString(s string) (n int, err error) {
 	defer b.m.Unlock()
 	common.Logger.Debug("start write string to buffer")
 	b.len ++
-	if b.len >= gLogBufferSize {
+	if b.len == gLogBufferSize {
 		b.ch <- true
 	}
 	return b.buf.WriteString(s)
@@ -40,10 +40,8 @@ func (b *LogBuffer) ReadString() string {
 }
 
 func (b *LogBuffer) ForceSet() {
-	b.m.Lock()
-	defer b.m.Unlock()
 	select {
-	case b.ch<- true:
+	case b.ch<-true:
 		common.Logger.Debug("force restart channel")
 	default:
 		common.Logger.Debug("the channel is already setted")

@@ -199,7 +199,9 @@ func logWriter(logBuffer *LogBuffer) {
 		select {
 		case <-timer.C:
 			//超时时间到,强制读取数据
-			logBuffer.ForceSet()
+			//logBuffer.ForceSet()
+			logBuffer.ch <- true
+			common.Logger.Debug("force restart channel")
 			//从channel读取数据,写入文件里
 			str := logBuffer.ReadString()
 			if str != "" {
