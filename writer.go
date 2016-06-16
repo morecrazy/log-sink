@@ -194,7 +194,7 @@ func bufWriter(channel chan []byte) {
 }
 
 func logWriter(logBuffer *LogBuffer) {
-	timer := time.NewTicker(10 * time.Second)
+	timer := time.NewTicker(1 * time.Second)
 	for {
 		select {
 		case <-timer.C:
