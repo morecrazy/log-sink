@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"backend/common"
 	"sync"
+	"bytes"
 )
 
 type File struct {
@@ -67,7 +68,7 @@ func backupLog(bts []byte) (flag bool, err error) {
 		//删除map中的记录
 		delete(mapLogNameToLogFile, logFullName)
 		//往新文件中写入数据
-		err := writeLog(bts)
+		err := writeLogBuf(bts)
 		return true, err
 	}
 	return false, nil
@@ -106,24 +107,24 @@ func getLogFile(logName string) (*os.File, error) {
 	return myFile.file, nil
 }
 
-func writeLog(bts []byte) error{
-	var res map[string]interface{}
-
-	if err := json.Unmarshal(bts, &res); err != nil {
-		return &LogSinkError{Code: http.StatusInternalServerError, Message : "json unmarshal failed: " + err.Error()}
+func getLogBuffer(logName string) *LogBuffer {
+	logPostFix := time.Now().Format("2006-01-02")
+	logFullName := logName + "." + logPostFix
+	logBuffer := mapLogNameToLogBuffer[logFullName]
+	if logBuffer == nil {
+		go logWriter(logBuffer)
+		logBuffer = new(LogBuffer)
+		logBuffer.buf = new(bytes.Buffer)
+		logBuffer.m = new(sync.Mutex)
+		logBuffer.ch = make(chan bool)
+		mapLogNameToLogBuffer[logFullName] = logBuffer
 	}
+	return logBuffer
+}
 
-	log := "\n"
-	if res["path"] == nil {
-		return &LogSinkError{Code: http.StatusInternalServerError, Message: "the log path is empty"}
-	}
-
-	if res["message"] != nil {
-		log = res["message"].(string) + "\n"
-	}
-	logName := res["path"].(string)
+//将log写入logName文件中
+func writeLog(logName, log string) error {
 	pFile, err := getLogFile(logName)
-
 	if pFile == nil || err != nil{
 		return &LogSinkError{Code: http.StatusInternalServerError, Message: "Cannot Get Log File: " + logName + ", Err: " + err.Error()}
 	}
@@ -136,8 +137,33 @@ func writeLog(bts []byte) error{
 	return nil
 }
 
+func writeLogBuf(bts []byte) error{
+	var res map[string]interface{}
 
-func writer(channel chan []byte) {
+	if err := json.Unmarshal(bts, &res); err != nil {
+		return &LogSinkError{Code: http.StatusInternalServerError, Message : "json unmarshal failed: " + err.Error()}
+	}
+	log := "\n"
+	if res["path"] == nil {
+		return &LogSinkError{Code: http.StatusInternalServerError, Message: "the log path is empty"}
+	}
+
+	if res["message"] != nil {
+		log = res["message"].(string) + "\n"
+	}
+	logName := res["path"].(string)
+
+	logBuffer := getLogBuffer(logName)
+	if _, err := logBuffer.WriteString(log); err != nil {
+		return &LogSinkError{Code: http.StatusInternalServerError, Message: "write log buffer failed!"}
+	}
+
+	return nil
+
+}
+
+
+func bufWriter(channel chan []byte) {
 	timer := time.NewTicker(60 * time.Second)
 	for {
 		select {
@@ -150,14 +176,31 @@ func writer(channel chan []byte) {
 			}
 		    //如果没有进行备份,则将这条记录写入日志文件中
 		    if flag == false {
-				if err := writeLog(bts); err != nil {
+				if err := writeLogBuf(bts); err != nil {
 					common.Logger.Error(err.Error())
 				}
 			}
 		default:
 			//从channel读取数据,写入文件里
 			bts := <- channel
-			if err := writeLog(bts); err != nil {
+			if err := writeLogBuf(bts); err != nil {
+				common.Logger.Error(err.Error())
+			}
+		}
+	}
+}
+
+func logWriter(logBuffer *LogBuffer) {
+	timer := time.NewTicker(30 * time.Second)
+	for {
+		select {
+		case <-timer.C:
+			//超时时间到,强制读取数据
+			logBuffer.ch <- true
+		default:
+			//从channel读取数据,写入文件里
+			str := logBuffer.ReadString()
+			if err := writeLog(logBuffer.name, str); err != nil {
 				common.Logger.Error(err.Error())
 			}
 		}

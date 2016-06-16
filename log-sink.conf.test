@@ -3,8 +3,8 @@
   "LogDir" : "/var/log/go_log",
   "LogLevel": "DEBUG",
   "External": {
-    "redisPath": "10.117.26.250",
-    "redisPortList": ":6379|:6380|:6381|:6382|:6383",
+    "redisPath": "192.168.1.204",
+    "redisPortList": ":32770",
     "redisKey": "logstash-chan",
     "logUnit": "MB"
   },

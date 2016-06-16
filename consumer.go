@@ -1,13 +1,13 @@
 package main
 import (
 	"third/redigo/redis"
-	"fmt"
+	"backend/common"
 )
 
 func consumer(redisUrl string) {
 	c, err := redis.Dial("tcp", redisUrl)
 	if err != nil {
-		fmt.Println("Connect to redis error", err)
+		common.Logger.Error("Connect to redis error: ", err)
 		return
 	}
 	defer c.Close()
@@ -15,12 +15,12 @@ func consumer(redisUrl string) {
 
 	var channel = make(chan []byte, gWriterCount)
 	for i := 0; i < int(gWriterCount); i++ {
-		go writer(channel)
+		go bufWriter(channel)
 	}
 	for {
 		ele, err := redis.Strings(c.Do("BLPOP", gRedisKey,"5"))
 		if err != nil {
-			fmt.Println("redis get failed:", err)
+			common.Logger.Error("Redis get failed: ", err)
 			continue
 		}
 		bts := []byte(ele[1])

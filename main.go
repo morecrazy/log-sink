@@ -10,7 +10,9 @@ import (
 )
 
 var mapLogNameToLogFile map[string]*File = make(map[string]*File)
+var mapLogNameToLogBuffer map[string]*LogBuffer = make(map[string]*LogBuffer)
 var wg sync.WaitGroup
+
 const (
 	DEFAULT_CONF_FILE = "./log-sink.conf"
 )
@@ -22,6 +24,7 @@ var gRedisKey string
 var gWriterCount int64
 var gLogSize int64
 var gLogUnit string
+var gLogBufferSize int64
 
 func init() {
 	const usage = "log-sink [-c config_file]"
@@ -35,6 +38,7 @@ func InitExternalConfig(config *common.Configure)  {
 	gLogUnit = config.External["logUnit"]
 	gLogSize = config.ExternalInt64["logSize"]
 	gWriterCount = config.ExternalInt64["writerCount"]
+	gLogBufferSize = config.ExternalInt64["logBufferSize"]
 }
 
 func main() {
@@ -70,5 +74,6 @@ func main() {
 		redisUrl := gRedisPath + ports[i]
 		go consumer(redisUrl)
 	}
+	fmt.Println("Sink log service is started...")
 	wg.Wait()
 }
