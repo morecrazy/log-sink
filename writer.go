@@ -116,7 +116,7 @@ func getLogBuffer(logName string) *LogBuffer {
 		logBuffer = new(LogBuffer)
 		logBuffer.buf = new(bytes.Buffer)
 		logBuffer.m = new(sync.Mutex)
-		logBuffer.ch = make(chan bool)
+		logBuffer.ch = make(chan bool, 1)
 		logBuffer.name = logName
 		logBuffer.len = 0
 		mapLogNameToLogBuffer[logFullName] = logBuffer
