@@ -67,12 +67,16 @@ func main() {
 		return
 	}
 	InitExternalConfig(common.Config)
+
+	redisList := strings.Split(gRedisPath, "|")
 	ports := strings.Split(gRedisPortList, "|")
 
-	wg.Add(len(ports))
-	for i := 0; i < len(ports); i++ {
-		redisUrl := gRedisPath + ports[i]
-		go consumer(redisUrl)
+	wg.Add(len(redisList) * len(ports))
+	for i := 0; i < len(redisList); i++ {
+		for j := 0; j < len(ports); j++ {
+			redisUrl := redisList[i] + ports[i]
+			go consumer(redisUrl)
+		}
 	}
 	fmt.Println("Sink log service is started...")
 	wg.Wait()
