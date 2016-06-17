@@ -74,7 +74,7 @@ func main() {
 	wg.Add(len(redisList) * len(ports))
 	for i := 0; i < len(redisList); i++ {
 		for j := 0; j < len(ports); j++ {
-			redisUrl := redisList[i] + ports[i]
+			redisUrl := redisList[i] + ports[j]
 			common.Logger.Debug("the redis url is %s: ", redisUrl)
 			go consumer(redisUrl)
 		}
