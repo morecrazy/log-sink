@@ -6,7 +6,6 @@ import (
 	"flag"
 	"runtime"
 	"sync"
-	"strings"
 )
 
 var mapLogNameToLogFile map[string]*File = make(map[string]*File)
@@ -19,7 +18,6 @@ const (
 
 var g_conf_file string
 var gRedisPath string
-var gRedisPortList string
 var gRedisKey string
 var gChannelBufferSize int64
 var gBufferWriterNum int64
@@ -34,7 +32,6 @@ func init() {
 
 func InitExternalConfig(config *common.Configure)  {
 	gRedisPath = config.External["redisPath"]
-	gRedisPortList = config.External["redisPortList"]
 	gRedisKey = config.External["redisKey"]
 	gLogUnit = config.External["logUnit"]
 	gLogSize = config.ExternalInt64["logSize"]
@@ -70,17 +67,14 @@ func main() {
 	}
 	InitExternalConfig(common.Config)
 
-	redisList := strings.Split(gRedisPath, "|")
-	ports := strings.Split(gRedisPortList, "|")
+	redisUrlList := StripRedisUrl(gRedisPath)
+	wg.Add(len(redisUrlList))
 
-	wg.Add(len(redisList) * len(ports))
-	for i := 0; i < len(redisList); i++ {
-		for j := 0; j < len(ports); j++ {
-			redisUrl := redisList[i] + ports[j]
-			common.Logger.Debug("the redis url is %s: ", redisUrl)
-			go consumer(redisUrl)
-		}
+	for i := 0; i < len(redisUrlList); i++ {
+		common.Logger.Debug("the redis url is %s: ", redisUrlList[i])
+		go consumer(redisUrlList[i])
 	}
+
 	fmt.Println("Sink log service is started...")
 	wg.Wait()
 }
