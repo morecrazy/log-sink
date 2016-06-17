@@ -13,8 +13,8 @@ func consumer(redisUrl string) {
 	defer c.Close()
 	defer wg.Done()
 
-	var channel = make(chan []byte, gWriterCount)
-	for i := 0; i < int(gWriterCount); i++ {
+	var channel = make(chan []byte, gChannelBufferSize)
+	for i := 0; i < int(gBufferWriterNum); i++ {
 		go bufWriter(channel)
 	}
 	for {

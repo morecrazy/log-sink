@@ -21,7 +21,8 @@ var g_conf_file string
 var gRedisPath string
 var gRedisPortList string
 var gRedisKey string
-var gWriterCount int64
+var gChannelBufferSize int64
+var gBufferWriterNum int64
 var gLogSize int64
 var gLogUnit string
 var gLogBufferSize int64
@@ -37,7 +38,8 @@ func InitExternalConfig(config *common.Configure)  {
 	gRedisKey = config.External["redisKey"]
 	gLogUnit = config.External["logUnit"]
 	gLogSize = config.ExternalInt64["logSize"]
-	gWriterCount = config.ExternalInt64["writerCount"]
+	gChannelBufferSize = config.ExternalInt64["channelBufferSize"]
+	gBufferWriterNum = config.ExternalInt64["bufferWriterNum"]
 	gLogBufferSize = config.ExternalInt64["logBufferSize"]
 }
 
