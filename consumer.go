@@ -18,7 +18,7 @@ func consumer(redisUrl string) {
 		go bufWriter(channel)
 	}
 	for {
-		ele, err := redis.Strings(c.Do("BLPOP", gRedisKey,"5"))
+		ele, err := redis.Strings(c.Do("BRPOP", gRedisKey,"5"))
 		if err != nil {
 			common.Logger.Error("Redis get failed: ", err)
 			continue
