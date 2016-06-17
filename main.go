@@ -75,6 +75,7 @@ func main() {
 	for i := 0; i < len(redisList); i++ {
 		for j := 0; j < len(ports); j++ {
 			redisUrl := redisList[i] + ports[i]
+			common.Logger.Debug("the redis url is %s: ", redisUrl)
 			go consumer(redisUrl)
 		}
 	}
