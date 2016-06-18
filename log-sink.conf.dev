@@ -1,16 +1,16 @@
 {
   "LogFile" : "log-sink",
-  "LogDir" : "/var/log/go_log",
+  "LogDir" : "./log",
   "LogLevel": "DEBUG",
   "External": {
-    "redisPath": "192.168.99.100",
-    "redisPortList": ":6379",
+    "redisPath": "192.168.99.100:32768",
     "redisKey": "logstash-chan",
     "logUnit": "MB"
   },
   "ExternalInt64": {
-    "writerCount": 100,
+    "channelBufferSize": 2000,
+    "bufferWriterNum": 1,
     "logSize": 1024,
-    "logBufferSize": 100
+    "logBufferSize": 1000
   }
 }
