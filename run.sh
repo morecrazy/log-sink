@@ -8,4 +8,4 @@ function cleanup()
 }
 
 trap cleanup EXIT
-/log-sink >> /var/log/go_log/log-sink.out 2>&1
+/log-sink -c /log-sink.conf >> /var/log/go_log/log-sink.out 2>&1
