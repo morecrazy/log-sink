@@ -79,7 +79,7 @@ func getLogFile(logName string) (*os.File, error) {
 	logFullName := logName + "." + logPostFix
 	myFile := mapLogNameToLogFile[logFullName]
 	if myFile == nil {
-		common.Logger.Debug("Starting open a new log file: %s", logFullName)
+		common.Logger.Info("Starting open a new log file: %s", logFullName)
 		var err error
 		pFile, err := os.OpenFile(logFullName, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0666)
 		if err != nil {
@@ -112,7 +112,7 @@ func getLogBuffer(logName string) *LogBuffer {
 	logFullName := logName + "." + logPostFix
 	logBuffer := mapLogNameToLogBuffer[logFullName]
 	if logBuffer == nil {
-		common.Logger.Debug("Creating a new logbuffer")
+		common.Logger.Info("Creating a new logbuffer")
 		logBuffer = new(LogBuffer)
 		logBuffer.buf = new(bytes.Buffer)
 		logBuffer.m = new(sync.Mutex)
