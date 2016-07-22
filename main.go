@@ -8,22 +8,25 @@ import (
 	"sync"
 )
 
-var mapLogNameToLogFile map[string]*File = make(map[string]*File)
-var mapLogNameToLogBuffer map[string]*LogBuffer = make(map[string]*LogBuffer)
-var wg sync.WaitGroup
-
 const (
 	DEFAULT_CONF_FILE = "./log-sink.conf"
 )
 
-var g_conf_file string
-var gRedisPath string
-var gRedisKey string
-var gChannelBufferSize int64
-var gBufferWriterNum int64
-var gLogSize int64
-var gLogUnit string
-var gLogBufferSize int64
+var (
+	wg sync.WaitGroup
+	mapLogNameToLogFile = make(map[string]*File)
+	mapLogNameToLogBuffer = make(map[string]*LogBuffer)
+	g_conf_file string
+	gRedisPath string
+	gRedisKey string
+	gBrokers string
+	gTopic string
+	gChannelBufferSize int64
+	gBufferWriterNum int64
+	gLogSize int64
+	gLogUnit string
+	gLogBufferSize int64
+)
 
 func init() {
 	const usage = "log-sink [-c config_file]"
@@ -34,6 +37,8 @@ func InitExternalConfig(config *common.Configure)  {
 	gRedisPath = config.External["redisPath"]
 	gRedisKey = config.External["redisKey"]
 	gLogUnit = config.External["logUnit"]
+	gBrokers = config.External["brokers"]
+	gTopic = config.External["topic"]
 	gLogSize = config.ExternalInt64["logSize"]
 	gChannelBufferSize = config.ExternalInt64["channelBufferSize"]
 	gBufferWriterNum = config.ExternalInt64["bufferWriterNum"]
@@ -60,6 +65,8 @@ func main() {
 	}
 
 	var err error
+	broker := new(KafkaBroker) //注入kafka broker
+
 	common.Logger, err = common.InitLogger("log-sink")
 	if err != nil {
 		fmt.Println("init log error")
@@ -67,14 +74,18 @@ func main() {
 	}
 	InitExternalConfig(common.Config)
 
-	redisUrlList := StripRedisUrl(gRedisPath)
-	wg.Add(len(redisUrlList))
-
-	for i := 0; i < len(redisUrlList); i++ {
-		common.Logger.Debug("the redis url is %s: ", redisUrlList[i])
-		go consumer(redisUrlList[i])
-	}
-
 	fmt.Println("Sink log service is started...")
+	brokerList, _ := broker.GetBrokerList()
+
+	wg.Add(1)
+	go func(){
+		defer wg.Done()
+		err = broker.ConsumeMsg(brokerList, gTopic)
+	}()
 	wg.Wait()
+
+	if err != nil {
+		fmt.Println("log sin error: ", err.Error())
+	}
+	fmt.Println("Sink log service is over...")
 }

@@ -11,7 +11,6 @@ func consumer(redisUrl string) {
 		return
 	}
 	defer c.Close()
-	defer wg.Done()
 
 	var channel = make(chan []byte, gChannelBufferSize)
 	for i := 0; i < int(gBufferWriterNum); i++ {
