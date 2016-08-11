@@ -65,6 +65,8 @@ func backupLog(bts []byte) (flag bool, err error) {
 		if err := os.Rename(logFullName, newLogName); err != nil {
 			return false, &LogSinkError{Code: http.StatusInternalServerError, Message : "rename file error: " + err.Error()}
 		}
+		//关闭文件句柄
+		mapLogNameToLogFile[logFullName].file.Close()
 		//删除map中的记录
 		delete(mapLogNameToLogFile, logFullName)
 		//往新文件中写入数据
@@ -162,7 +164,6 @@ func writeLogBuf(bts []byte) error{
 	}
 
 	return nil
-
 }
 
 
