@@ -6,6 +6,8 @@ import (
 	"flag"
 	"runtime"
 	"sync"
+	"net/http"
+	_ "net/http/pprof"
 )
 
 const (
@@ -45,11 +47,19 @@ func InitExternalConfig(config *common.Configure)  {
 	gLogBufferSize = config.ExternalInt64["logBufferSize"]
 }
 
+func startPprof() {
+	go func() {
+		common.Logger.Error("%v", http.ListenAndServe("localhost:6060", nil))
+	}()
+}
+
 func main() {
 	//set runtime variable
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	//get flag
 	flag.Parse()
+
+	startPprof()
 
 	if g_conf_file != "" {
 		common.Config = new(common.Configure)
