@@ -113,12 +113,13 @@ func getLogBuffer(logName string) *LogBuffer {
 	logPostFix := time.Now().Format("2006-01-02")
 	logFullName := logName + "." + logPostFix
 	logBuffer, found := c.Get(logFullName)
-	if found {
+	if !found {
 		common.Logger.Info("Creating a new logbuffer: %s", logFullName)
 		logBuffer := NewLogBuffer(logName)
 		//设置key过期时间
 		c.Set(logFullName, logBuffer, cache.DefaultExpiration)
 		go logWriter(logBuffer)
+		return logBuffer
 	}
 	return logBuffer.(*LogBuffer)
 }
