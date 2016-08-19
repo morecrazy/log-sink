@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"backend/common"
 	"sync"
-	"bytes"
+	"codoon_ops/log-sink/cache"
 )
 
 type File struct {
@@ -112,19 +112,15 @@ func getLogFile(logName string) (*os.File, error) {
 func getLogBuffer(logName string) *LogBuffer {
 	logPostFix := time.Now().Format("2006-01-02")
 	logFullName := logName + "." + logPostFix
-	logBuffer := mapLogNameToLogBuffer[logFullName]
-	if logBuffer == nil {
-		common.Logger.Info("Creating a new logbuffer")
-		logBuffer = new(LogBuffer)
-		logBuffer.buf = new(bytes.Buffer)
-		logBuffer.m = new(sync.Mutex)
-		logBuffer.ch = make(chan bool, 1)
-		logBuffer.name = logName
-		logBuffer.len = 0
-		mapLogNameToLogBuffer[logFullName] = logBuffer
+	logBuffer, found := c.Get(logFullName)
+	if found {
+		common.Logger.Info("Creating a new logbuffer: %s", logFullName)
+		logBuffer := NewLogBuffer(logName)
+		//设置key过期时间
+		c.Set(logFullName, logBuffer, cache.DefaultExpiration)
 		go logWriter(logBuffer)
 	}
-	return logBuffer
+	return logBuffer.(*LogBuffer)
 }
 
 //将log写入logName文件中
@@ -196,6 +192,7 @@ func bufWriter(channel chan []byte) {
 
 func logWriter(logBuffer *LogBuffer) {
 	timer := time.NewTicker(1 * time.Second)
+	WriterLoop:
 	for {
 		select {
 		case <- logBuffer.ch:
@@ -211,6 +208,9 @@ func logWriter(logBuffer *LogBuffer) {
 			if err := writeLog(logBuffer.name, str); err != nil {
 				common.Logger.Error(err.Error())
 			}
+		case <-logBuffer.closing:
+			//writer过期
+			break WriterLoop
 		}
 	}
 }

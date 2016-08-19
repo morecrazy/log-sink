@@ -11,6 +11,11 @@ type LogBuffer struct {
 	len int64
 	ch chan bool
 	name string
+	closing chan struct{}
+}
+
+func NewLogBuffer(s string) *LogBuffer {
+	return &LogBuffer{m: new(sync.Mutex), buf: new(bytes.Buffer), len: 0, ch: make(chan bool, 1), name: s, closing:make(chan struct{})}
 }
 
 func (b *LogBuffer) WriteString(s string) (n int, err error) {
