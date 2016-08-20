@@ -114,6 +114,8 @@ func getLogBuffer(logName string) *LogBuffer {
 	logFullName := logName + "." + logPostFix
 	logBuffer, found := c.Get(logFullName)
 	if !found {
+		//删除失效的key
+		c.Delete(logFullName)
 		common.Logger.Info("Creating a new logbuffer: %s", logFullName)
 		logBuffer := NewLogBuffer(logName)
 		//设置key过期时间
