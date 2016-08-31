@@ -49,6 +49,7 @@ func (kafkaBroker *KafkaBroker) ConsumeMsg(brokers []string, topic string) error
 
 	//针对topic的每一个partition都开启一个partition consumer
 	for _, partition := range partitionList {
+		common.Logger.Info("Initiating a partition Consumer..")
 		partitionConsumer, err := consumer.ConsumePartition(gTopic, partition, kafka.OffsetNewest)
 		if err != nil {
 			common.Logger.Error(err.Error())
